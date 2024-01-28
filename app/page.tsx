@@ -220,7 +220,7 @@ export default function Home() {
       </div>
       <div className="space-y-2 py-4">
         <h2 className="font-bold text-lg">Formatos:</h2>
-        <div className="flex gap-x-2">
+        <div className="flex flex-wrap gap-2">
           {search.filetypes.map((filetype) => (
             <div key={"site" + filetype.type}>
               <button
