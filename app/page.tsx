@@ -93,7 +93,7 @@ export default function Home() {
         include: false,
       },
       {
-        url: "https://ambiente.gov.sv",
+        url: "https://ambiente.gob.sv",
         name: "Ministerio de Medio Ambiente y Recursos Naturales",
         include: false,
       },
