@@ -4,6 +4,7 @@ import { format } from "date-fns"
 import useFetch, { setQueryParams } from "http-react"
 import Link from "next/link"
 import { useState } from "react"
+import { IoLogoGithub } from "react-icons/io"
 import { useObject } from "react-kuh"
 
 function searchFormatDate(dt: string | Date) {
@@ -162,6 +163,13 @@ export default function Home() {
 
   return (
     <main className="p-4">
+      <Link
+        href="https://github.com/danybeltran/public-elsalvador-information"
+        target="_blank"
+        className="btn btn-sm btn-neutral"
+      >
+        <IoLogoGithub /> Github
+      </Link>
       <form
         onSubmit={(e) => {
           e.preventDefault()
