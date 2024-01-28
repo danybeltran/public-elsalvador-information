@@ -168,7 +168,7 @@ export default function Home() {
         target="_blank"
         className="btn btn-sm btn-neutral"
       >
-        <IoLogoGithub /> Github
+        <IoLogoGithub /> View code
       </Link>
       <form
         onSubmit={(e) => {
