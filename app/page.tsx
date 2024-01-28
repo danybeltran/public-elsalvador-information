@@ -1,113 +1,280 @@
-import Image from "next/image";
+"use client"
+
+import { format } from "date-fns"
+import useFetch, { setQueryParams } from "http-react"
+import Link from "next/link"
+import { useState } from "react"
+import { useObject } from "react-kuh"
+
+function searchFormatDate(dt: string | Date) {
+  return format(new Date(dt), "yyyy-MM-dd")
+}
 
 export default function Home() {
+  const [search, actions] = useObject({
+    query: "",
+    dateStart: "",
+    dateEnd: "",
+    filetypes: [
+      {
+        type: "PDF",
+        include: false,
+      },
+      {
+        type: "DOC",
+        include: false,
+      },
+      {
+        type: "DOCX",
+        include: false,
+      },
+      {
+        type: "XLS",
+        include: false,
+      },
+      {
+        type: "XLSX",
+        include: false,
+      },
+      {
+        type: "PPT",
+        include: false,
+      },
+      {
+        type: "PPTX",
+        include: false,
+      },
+    ],
+    sites: [
+      {
+        url: "https://jurisprudencia.gob.sv",
+        name: "Jurisprudencia",
+        include: false,
+      },
+      {
+        url: "https://www.transparencia.gob.sv",
+        name: "Transparencia",
+        include: false,
+      },
+      {
+        url: "https://www.pnc.gob.sv",
+        name: "PNC",
+        include: false,
+      },
+      {
+        url: "https://www.mh.gob.sv",
+        name: "Ministerio de Hacienda",
+        include: false,
+      },
+      {
+        url: "https://www.mtps.gob.sv",
+        name: "Ministerio de Trabajo",
+        include: false,
+      },
+      {
+        url: "https://www.mop.gob.sv",
+        name: "Ministerio de Obras Públicas",
+        include: false,
+      },
+      {
+        url: "https://www.salud.gob.sv",
+        name: "Ministerio de Salud",
+        include: false,
+      },
+      {
+        url: "https://www.mag.gob.sv",
+        name: "Ministerio de Agricultura y Ganadería",
+        include: false,
+      },
+      {
+        url: "https://fuerzaarmada.mil.sv",
+        name: "Ministerio de la Defensa Nacional",
+        include: false,
+      },
+      {
+        url: "https://ambiente.gov.sv",
+        name: "Ministerio de Medio Ambiente y Recursos Naturales",
+        include: false,
+      },
+      {
+        url: "https://www.cultura.gob.sv",
+        name: "Ministerio de Cultura",
+        include: false,
+      },
+      {
+        url: "https://www.economia.gob.sv",
+        name: "Ministerio de Economía",
+        include: false,
+      },
+      {
+        url: "https://www.mitur.gob.sv",
+        name: "Ministerio de Turismo",
+        include: false,
+      },
+      {
+        url: "https://www.mined.gob.sv",
+        name: "Ministerio de Educación",
+        include: false,
+      },
+      {
+        url: "https://www.rree.gob.sv",
+        name: "Ministerio de Relaciones Exteriores",
+        include: false,
+      },
+      {
+        url: "https://www.gobernacion.gob.sv",
+        name: "Ministerio de Gobernación y Desarrollo Territorial",
+        include: false,
+      },
+      {
+        url: "https://www.seguridad.gob.sv",
+        name: "Ministerio de Justicia y Seguridad Pública",
+        include: false,
+      },
+      {
+        url: "https://www.vivienda.gob.sv",
+        name: "Ministerio de Vivienda",
+        include: false,
+      },
+    ],
+  })
+
+  const startSearch = () => {
+    const newSearchUrl = setQueryParams("https://www.google.com/search", {
+      igu: 1,
+      q: [
+        search.query,
+        search.filetypes
+          .filter((filetype) => filetype.include)
+          .map((filetype) => `filetype:${filetype.type}`)
+          .join(" OR "),
+        search.sites
+          .filter((site) => site.include)
+          .map((site) => `site:${site.url}`)
+          .join(" OR "),
+        search.dateEnd ? `before:${search.dateEnd}` : "",
+        search.dateStart ? `after:${search.dateStart}` : "",
+      ].join(" "),
+    })
+
+    window.open(newSearchUrl)
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <main className="p-4">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          startSearch()
+        }}
+        className="pt-4"
+      >
+        <input
+          placeholder="Buscar"
+          value={search.query}
+          onChange={(e) =>
+            actions.setPartialValue({
+              query: e.target.value,
+            })
+          }
+          type="text"
+          className="p-4  border-2 border-black"
+        />
+        <button className="p-4 text-indigo-700 border-2 border-black">
+          Buscar!
+        </button>
+      </form>
+      <div className="py-2">
+        <h2>Buscar en:</h2>
+        <div className="flex flex-wrap gap-2">
+          {search.sites.map((site) => (
+            <div key={"site" + site.url}>
+              <button
+                onClick={() => {
+                  actions.setPartialValue({
+                    sites: search.sites.map(($site) =>
+                      $site.name === site.name
+                        ? {
+                            ...$site,
+                            include: !$site.include,
+                          }
+                        : $site
+                    ),
+                  })
+                }}
+                className={`p-2 select-none border-2 border-black ${
+                  site.include ? "bg-indigo-500 text-white" : ""
+                }`}
+              >
+                {site.name}
+              </button>
+            </div>
+          ))}
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <hr className="border-black" />
+      <div className="py-2">
+        <h2>Formatos:</h2>
+        <div className="flex gap-x-2">
+          {search.filetypes.map((filetype) => (
+            <div key={"site" + filetype.type}>
+              <button
+                onClick={() => {
+                  actions.setPartialValue({
+                    filetypes: search.filetypes.map(($filetype) =>
+                      $filetype.type === filetype.type
+                        ? {
+                            ...$filetype,
+                            include: !$filetype.include,
+                          }
+                        : $filetype
+                    ),
+                  })
+                }}
+                className={`p-2 select-none border-2 border-black ${
+                  filetype.include ? "bg-indigo-500 text-white" : ""
+                }`}
+              >
+                {filetype.type}
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <hr />
+      <div className="flex gap-x-2">
+        <div className="py-2">
+          <h2>Fecha de inicio:</h2>
+          <input
+            type="date"
+            onChange={(e) => {
+              actions.setPartialValue({
+                dateStart: e.target.value
+                  ? searchFormatDate(e.target.value)
+                  : "",
+              })
+              e.target.value
+            }}
+            className={`p-2 select-none border-2 border-black`}
+          />
+          <div className="flex gap-x-2"></div>
+        </div>
+        <div className="py-2">
+          <h2>Fecha final:</h2>
+          <input
+            type="date"
+            value={search.dateEnd}
+            onChange={(e) => {
+              actions.setPartialValue({
+                dateEnd: e.target.value ? searchFormatDate(e.target.value) : "",
+              })
+              e.target.value
+            }}
+            className={`p-2 select-none border-2 border-black`}
+          />
+          <div className="flex gap-x-2"></div>
+        </div>
       </div>
     </main>
-  );
+  )
 }
