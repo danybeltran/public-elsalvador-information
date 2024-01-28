@@ -167,7 +167,7 @@ export default function Home() {
           e.preventDefault()
           startSearch()
         }}
-        className="pt-4"
+        className="pt-4 space-x-2 flex"
       >
         <input
           placeholder="Buscar"
@@ -178,14 +178,12 @@ export default function Home() {
             })
           }
           type="text"
-          className="p-4  border-2 border-black"
+          className="input input-bordered w-full"
         />
-        <button className="p-4 text-indigo-700 border-2 border-black">
-          Buscar!
-        </button>
+        <button className="btn btn-primary">Buscar</button>
       </form>
-      <div className="py-2">
-        <h2>Buscar en:</h2>
+      <div className="space-y-2 py-4">
+        <h2 className="font-bold text-lg">Buscar en:</h2>
         <div className="flex flex-wrap gap-2">
           {search.sites.map((site) => (
             <div key={"site" + site.url}>
@@ -202,8 +200,8 @@ export default function Home() {
                     ),
                   })
                 }}
-                className={`p-2 select-none border-2 border-black ${
-                  site.include ? "bg-indigo-500 text-white" : ""
+                className={`btn ${
+                  site.include ? "btn-primary" : "btn-outline"
                 }`}
               >
                 {site.name}
@@ -212,9 +210,8 @@ export default function Home() {
           ))}
         </div>
       </div>
-      <hr className="border-black" />
-      <div className="py-2">
-        <h2>Formatos:</h2>
+      <div className="space-y-2 py-4">
+        <h2 className="font-bold text-lg">Formatos:</h2>
         <div className="flex gap-x-2">
           {search.filetypes.map((filetype) => (
             <div key={"site" + filetype.type}>
@@ -231,8 +228,8 @@ export default function Home() {
                     ),
                   })
                 }}
-                className={`p-2 select-none border-2 border-black ${
-                  filetype.include ? "bg-indigo-500 text-white" : ""
+                className={`btn ${
+                  filetype.include ? "btn-primary" : "btn-outline"
                 }`}
               >
                 {filetype.type}
@@ -242,9 +239,9 @@ export default function Home() {
         </div>
       </div>
       <hr />
-      <div className="flex gap-x-2">
-        <div className="py-2">
-          <h2>Fecha de inicio:</h2>
+      <div className="flex gap-x-2 py-4">
+        <div className="py-2 space-y-2">
+          <h2 className="font-bold text-lg">Fecha de inicio:</h2>
           <input
             type="date"
             onChange={(e) => {
@@ -255,12 +252,12 @@ export default function Home() {
               })
               e.target.value
             }}
-            className={`p-2 select-none border-2 border-black`}
+            className={`input input-bordered`}
           />
           <div className="flex gap-x-2"></div>
         </div>
-        <div className="py-2">
-          <h2>Fecha final:</h2>
+        <div className="py-2 space-y-2">
+          <h2 className="font-bold text-lg">Fecha final:</h2>
           <input
             type="date"
             value={search.dateEnd}
@@ -270,7 +267,7 @@ export default function Home() {
               })
               e.target.value
             }}
-            className={`p-2 select-none border-2 border-black`}
+            className={`input input-bordered`}
           />
           <div className="flex gap-x-2"></div>
         </div>
