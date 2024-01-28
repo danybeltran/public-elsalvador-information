@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Public El Salvador information search",
   description:
-    "Make google searches in public information from El Salvador government websites",
+    "Make (faster) google searches in public information from El Salvador government websites",
 }
 
 export default function RootLayout({
