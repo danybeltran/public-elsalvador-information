@@ -322,7 +322,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="mb-16">
+      <div className="mb-4">
         <button
           className="btn btn-neutral"
           onClick={() => {
@@ -339,7 +339,7 @@ export default function Home() {
       {activeSearch && (
         <iframe
           src={newSearchUrl}
-          className="w-full h-[70vh]"
+          className="w-full h-[70vh] border-4 shadow-xl border-primary rounded-xl mb-10"
           id="search-frame"
         ></iframe>
       )}
