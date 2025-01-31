@@ -1,18 +1,23 @@
 "use client"
 
 import { format } from "date-fns"
-import useFetch, { setQueryParams } from "http-react"
+import useFetch, { serialize, setQueryParams } from "http-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { BiCopy } from "react-icons/bi"
 import { IoLogoGithub } from "react-icons/io"
 import { useObject } from "react-kuh"
+import CopyableText from "./copyable-text"
+import { BsArrowUp } from "react-icons/bs"
+import { store } from "atomic-state"
 
 function searchFormatDate(dt: string | Date) {
   return format(new Date(dt), "yyyy-MM-dd")
 }
 
-export default function Home() {
-  const [search, actions] = useObject({
+const useSearch = store({
+  key: "search",
+  default: {
     query: "",
     dateStart: "",
     dateEnd: "",
@@ -138,27 +143,45 @@ export default function Home() {
         include: false,
       },
     ],
+  },
+})
+
+export default function Home() {
+  const search = useSearch()
+
+  const searchQuery = [
+    search.query,
+    search.filetypes
+      .filter((filetype) => filetype.include)
+      .map((filetype) => `filetype:${filetype.type}`)
+      .join(" OR "),
+    search.sites
+      .filter((site) => site.include)
+      .map((site) => `site:${site.url}`)
+      .join(" OR "),
+    search.dateEnd ? `before:${search.dateEnd}` : "",
+    search.dateStart ? `after:${search.dateStart}` : "",
+  ].join(" ")
+
+  useEffect(() => {
+    setActiveSearch(false)
+  }, [serialize(search)])
+
+  const [activeSearch, setActiveSearch] = useState(false)
+
+  const newSearchUrl = setQueryParams("https://www.google.com/search", {
+    igu: 1,
+    q: searchQuery,
   })
 
   const startSearch = () => {
-    const newSearchUrl = setQueryParams("https://www.google.com/search", {
-      igu: 1,
-      q: [
-        search.query,
-        search.filetypes
-          .filter((filetype) => filetype.include)
-          .map((filetype) => `filetype:${filetype.type}`)
-          .join(" OR "),
-        search.sites
-          .filter((site) => site.include)
-          .map((site) => `site:${site.url}`)
-          .join(" OR "),
-        search.dateEnd ? `before:${search.dateEnd}` : "",
-        search.dateStart ? `after:${search.dateStart}` : "",
-      ].join(" "),
-    })
+    setActiveSearch(true)
 
-    window.open(newSearchUrl)
+    setTimeout(() => {
+      document.querySelector("#search-frame")?.scrollIntoView({
+        behavior: "smooth",
+      })
+    }, 500)
   }
 
   return (
@@ -181,14 +204,16 @@ export default function Home() {
           placeholder="Buscar"
           value={search.query}
           onChange={(e) =>
-            actions.setPartialValue({
+            search.setPartial({
               query: e.target.value,
             })
           }
           type="text"
           className="input input-bordered w-full"
         />
-        <button className="btn btn-primary">Buscar</button>
+        <button className="btn btn-primary" onClick={() => startSearch()}>
+          Buscar
+        </button>
       </form>
       <div className="space-y-2 py-4">
         <h2 className="font-bold text-lg">Buscar en:</h2>
@@ -197,7 +222,7 @@ export default function Home() {
             <div key={"site" + site.url}>
               <button
                 onClick={() => {
-                  actions.setPartialValue({
+                  search.setPartial({
                     sites: search.sites.map(($site) =>
                       $site.name === site.name
                         ? {
@@ -225,7 +250,7 @@ export default function Home() {
             <div key={"site" + filetype.type}>
               <button
                 onClick={() => {
-                  actions.setPartialValue({
+                  search.setPartial({
                     filetypes: search.filetypes.map(($filetype) =>
                       $filetype.type === filetype.type
                         ? {
@@ -253,7 +278,7 @@ export default function Home() {
           <input
             type="date"
             onChange={(e) => {
-              actions.setPartialValue({
+              search.setPartial({
                 dateStart: e.target.value
                   ? searchFormatDate(e.target.value)
                   : "",
@@ -270,7 +295,7 @@ export default function Home() {
             type="date"
             value={search.dateEnd}
             onChange={(e) => {
-              actions.setPartialValue({
+              search.setPartial({
                 dateEnd: e.target.value ? searchFormatDate(e.target.value) : "",
               })
               e.target.value
@@ -280,6 +305,44 @@ export default function Home() {
           <div className="flex gap-x-2"></div>
         </div>
       </div>
+
+      <div>
+        <h4 className="text-lg font-bold" id="generated-search">
+          Búsqueda generada:
+        </h4>
+
+        <div className="py-4 space-y-4">
+          <div>
+            <b>Búsqueda: </b> <CopyableText text={searchQuery} />
+          </div>
+
+          <div>
+            <b>URL: </b> <CopyableText text={newSearchUrl} />
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-16">
+        <button
+          className="btn btn-neutral"
+          onClick={() => {
+            scrollTo({
+              top: 0,
+              behavior: "smooth",
+            })
+          }}
+        >
+          <BsArrowUp /> Regresar al inicio
+        </button>
+      </div>
+
+      {activeSearch && (
+        <iframe
+          src={newSearchUrl}
+          className="w-full h-[70vh]"
+          id="search-frame"
+        ></iframe>
+      )}
     </main>
   )
 }
